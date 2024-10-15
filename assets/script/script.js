@@ -5,11 +5,11 @@ const images = [
     'w_95.png', 'w_98.png', 'w_Vista.png', 'w_XP.png'
 ];
 
-let firstCard, secondCard;
-let hasFlippedCard = false;
-let lockBoard = false;
-let pairsFound = 0;
-let startTime, timerInterval;
+let primeiraCarta, segundaCarta;
+let cartaVirada = false;
+let jogoBloqueado = false;
+let paresEncontrado = 0;
+let tempoInicial, contadorTempo;
 
 const board = document.getElementById('game');
 const timerDisplay = document.getElementById('timer');
@@ -21,40 +21,39 @@ function shuffle(array) {
 function createBoard() {
     const shuffledImages = shuffle(images);
     shuffledImages.forEach(imgSrc => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-        // Atualizando o caminho da imagem
-        card.innerHTML = `<img src="./assets/img/png/${imgSrc}" alt="memory card">`;
-        card.addEventListener('click', flipCard);
-        board.appendChild(card);
+        const carta = document.createElement('div');
+        carta.classList.add('carta');
+        carta.innerHTML = `<img src="./assets/img/png/${imgSrc}" alt="memory card">`;
+        carta.addEventListener('click', flipCard);
+        board.appendChild(carta);
     });
 }
 
 function flipCard() {
-    if (lockBoard) return;
-    if (this === firstCard) return;
+    if (jogoBloqueado) return;
+    if (this === primeiraCarta) return;
 
     this.classList.add('flipped');
 
-    if (!hasFlippedCard) {
-        hasFlippedCard = true;
-        firstCard = this;
-        if (!startTime) {
-            startTime = new Date();
-            startTimer();
+    if (!cartaVirada) {
+        cartaVirada = true;
+        primeiraCarta = this;
+        if (!tempoInicial) {
+            tempoInicial = new Date();
+            tempoInicialr();
         }
         return;
     }
 
-    secondCard = this;
+    segundaCarta = this;
     checkForMatch();
 }
 
 function checkForMatch() {
-    if (firstCard.innerHTML === secondCard.innerHTML) {
+    if (primeiraCarta.innerHTML === segundaCarta.innerHTML) {
         disableCards();
-        pairsFound++;
-        if (pairsFound === 8) {
+        paresEncontrado++;
+        if (paresEncontrado === 8) {
             endGame();
         }
     } else {
@@ -63,34 +62,34 @@ function checkForMatch() {
 }
 
 function disableCards() {
-    firstCard.removeEventListener('click', flipCard);
-    secondCard.removeEventListener('click', flipCard);
+    primeiraCarta.removeEventListener('click', flipCard);
+    segundaCarta.removeEventListener('click', flipCard);
     resetBoard();
 }
 
 function unflipCards() {
-    lockBoard = true;
+    jogoBloqueado = true;
     setTimeout(() => {
-        firstCard.classList.remove('flipped');
-        secondCard.classList.remove('flipped');
+        primeiraCarta.classList.remove('flipped');
+        segundaCarta.classList.remove('flipped');
         resetBoard();
     }, 1000);
 }
 
 function resetBoard() {
-    [hasFlippedCard, lockBoard] = [false, false];
-    [firstCard, secondCard] = [null, null];
+    [cartaVirada, jogoBloqueado] = [false, false];
+    [primeiraCarta, segundaCarta] = [null, null];
 }
 
-function startTimer() {
-    timerInterval = setInterval(() => {
-        const elapsedTime = Math.floor((new Date() - startTime) / 1000);
+function tempoInicialr() {
+    contadorTempo = setInterval(() => {
+        const elapsedTime = Math.floor((new Date() - tempoInicial) / 1000);
         timerDisplay.textContent = `Tempo: ${elapsedTime}s`;
     }, 1000);
 }
 
 function endGame() {
-    clearInterval(timerInterval);
+    clearInterval(contadorTempo);
     alert('Parabéns! Você encontrou todos os pares!');
 }
 
